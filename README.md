@@ -16,7 +16,7 @@
 
 # GreenSocket
 
-Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, and Linux.
+Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, Linux and Windows.
 GreenSocket is Kitura/BlueSocket with modifications to works on Windows.
 This is a work in progress. Code changes no yet commmited. Stay tuned.
 
