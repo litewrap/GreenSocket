@@ -14,16 +14,18 @@
     </a>
 </p>
 
-# BlueSocket
+# GreenSocket
 
 Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, and Linux.
+GreenSocket is Kitura/BlueSocket with modifications to works on Windows.
+This is a work in progress. Code changes no yet commmited. Stay tuned.
 
 ## Prerequisites
 
 ### Swift
 
-* Swift Open Source `swift-5.1-RELEASE` toolchain (**Minimum REQUIRED for latest release**)
-* Swift Open Source `swift-5.4-RELEASE` toolchain (**Recommended**)
+* Swift Open Source `swift-5.4-RELEASE` toolchain (**Minimum REQUIRED for latest release**)
+* Swift Open Source `swift-5.6.2-RELEASE` toolchain (**Recommended**)
 * Swift toolchain included in *Xcode Version 11.0 or higher*.
 
 ### macOS
@@ -51,8 +53,13 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 
 ### Linux
 
-* Ubuntu 16.04 or 18.04
+* Ubuntu 18.04 or 20.04
 * One of the Swift Open Source toolchains listed above.
+
+### Windows
+
+* Windows 10
+* GrenSocket should work on *Windows 11* but has **NOT** been tested yet.
 
 ### Other Platforms
 
@@ -64,6 +71,7 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 * [BlueSSLService](https://github.com/Kitura/BlueSSLService.git) can be used to add **SSL/TLS** support.
 	- If using this package, please note that the  **libssl-dev** package is required to be installed when building on Linux.
 
+* Not tested on Windows
 
 ## Build
 
@@ -405,12 +413,18 @@ class EchoServer {
 					
 				} while shouldKeepRunning
 				
-				print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
-				socket.close()
+				// Code moved after dictionary access since closing a socket turns the value of socket.socketfd to -1
+				// not the socketfd value we want to refers into the dictionary
+				
+				// print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+				// socket.close()
 				
 				self.socketLockQueue.sync { [unowned self, socket] in
 					self.connectedSockets[socket.socketfd] = nil
 				}
+				
+				print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+				socket.close()
 				
 			}
 			catch let error {
