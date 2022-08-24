@@ -26,8 +26,7 @@ This is a work in progress. Code changes no yet commmited. Stay tuned.
 
 ### Swift
 
-* Swift Open Source `swift-5.4-RELEASE` toolchain (**Minimum REQUIRED for latest release**)
-* Swift Open Source `swift-5.6.2-RELEASE` toolchain (**Recommended**)
+* Swift Open Source `swift-5.6.2-RELEASE` toolchain
 * Swift toolchain included in *Xcode Version 11.0 or higher*.
 
 ### macOS
