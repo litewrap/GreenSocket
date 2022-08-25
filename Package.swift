@@ -3,6 +3,9 @@
 /**
  * Copyright IBM Corporation and the Kitura project authors 2017-2020
  *
+ * Modified by Réjean Lamy on 2022/08/24.
+ * Copyright © 2022 Réjean Lamy. All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,31 +21,19 @@
 
 import PackageDescription
 
-#if os(Linux) || os(macOS) || os(iOS) || os(tvOS)
+#if os(Linux) || os(macOS) || os(iOS) || os(tvOS) || os(Windows)
 let package = Package(
-    name: "Socket",
+    name: "GreenSocket",
     products: [
         .library(
             name: "Socket",
             targets: ["Socket"]),
-        .library(
-            name: "BlueSocketTestCommonLibrary",
-            targets: ["BlueSocketTestCommonLibrary"]),
     ],
     dependencies: [],
     targets: [
         .target(
             name: "Socket",
-            dependencies: [],
-            exclude: ["Info.plist", "Socket.h"]
-        ),
-        .testTarget(
-            name: "SocketTests",
-            dependencies: ["Socket", "BlueSocketTestCommonLibrary"]
-        ),
-        .target(
-            name: "BlueSocketTestCommonLibrary",
-            dependencies: [ "Socket" ]
+            dependencies: []
         ),
     ]
 )
