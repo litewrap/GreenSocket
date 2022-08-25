@@ -1,46 +1,28 @@
-<p align="center">
-    <a href="https://www.kitura.io/packages.html#all">
-    <img src="https://img.shields.io/badge/docs-kitura.io-1FBCE4.svg" alt="APIDoc">
-    </a>
-    <a href="https://travis-ci.org/Kitura/BlueSocket">
-    <img src="https://travis-ci.org/Kitura/BlueSocket.svg?branch=master" alt="Build Status - Master">
-    </a>
-    <img src="https://img.shields.io/badge/os-macOS-green.svg?style=flat" alt="macOS">
-    <img src="https://img.shields.io/badge/os-iOS-green.svg?style=flat" alt="iOS">
-    <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux">
-    <img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
-    <a href="http://swift-at-ibm-slack.mybluemix.net/">
-    <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg" alt="Slack Status">
-    </a>
-</p>
-
 # GreenSocket
 
 Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, Linux and Windows.
 
-GreenSocket is Kitura/BlueSocket with modifications to works on Windows.
+**GreenSocket** is **Kitura/BlueSocket** with modifications to works on Windows. Also **GreenSocket** provides some additional features. 
 
-This is a work in progress. Code changes no yet commmited. Stay tuned.
+The documentation keep the original **BlueSocket** naming in titles where doc is applicable to both the original product and **GreenSocket**. Documentation titles named **GreenSocket**  shows the features added by **GreenSocket**.    
 
 ## Prerequisites
 
 ### Swift
 
 * Swift Open Source `swift-5.6.2-RELEASE` toolchain
-* Swift toolchain included in *Xcode Version 11.0 or higher*.
+* Swift toolchain included in *Xcode Version 13.0 or higher*.
 
 ### macOS
 
-* macOS 10.14.6 (*Mojave*) or higher.
-* Xcode Version 11.0 or higher using one of the above toolchains.
-* Xcode Version 12.5 or higher using the included toolchain (*Recommended*).
+* macOS 12.5.1 (*Monterey*) or higher.
+* Xcode Version 13.0 or higher using one of the above toolchains.
 * Secure Transport is provided by macOS.
 
 ### iOS
 
-* iOS 10.0 or higher
-* Xcode Version 11.0 or higher using one of the above toolchains.
-* Xcode Version 12.5 or higher using the included toolchain (*Recommended*).
+* iOS 14.0 or higher
+* Xcode Version 13.0 or higher using one of the above toolchains.
 
 Note:
 
@@ -59,7 +41,7 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 
 ### Windows
 
-* Windows 10
+* Windows 10. Follow the Windows installation steps (https://www.swift.org/download/)
 * GrenSocket should work on *Windows 11* but has **NOT** been tested yet.
 
 ### Other Platforms
@@ -72,11 +54,59 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 * [BlueSSLService](https://github.com/Kitura/BlueSSLService.git) can be used to add **SSL/TLS** support.
 	- If using this package, please note that the  **libssl-dev** package is required to be installed when building on Linux.
 
-* Not tested on Windows
+* No add-ins tested on Windows
 
-## Build
+## Build the demos
 
-To build Socket from the command line:
+To build the Socket Demos from the command line:
+
+On macOS / linux
+
+```
+% cd <path-to-clone>/GreenSocketDemos
+% swift build
+```
+
+On Windows
+
+```
+C: cd <path-to-clone>\GreenSocketDemos
+C: swift build
+```
+
+## Run the demos
+
+To run the EchoServerDemo on macOS / Linux
+
+Open a terminal from the GreenSocketDemos folder
+```
+% ./.build/debug/EchoServerDemo
+```
+
+To run the EchoClientDemo on macOS / Linux
+
+Open a second terminal from the GreenSocketDemos folder  
+```
+% ./.build/debug/EchoClientDemo
+```
+
+To run the EchoServerDemo on Windows
+
+Open a command prompt from the GreenSocketDemos folder
+ 
+```
+C: .build\debug\EchoServerDemo.exe
+```
+
+To run the EchoClientDemo on Windows
+
+Open a second command prompt from the GreenSocketDemos folder
+ 
+```
+C: .build\debug\EchoClientDemo.exe
+```
+
+## Build Socket from the command line
 
 ```
 % cd <path-to-clone>
@@ -85,14 +115,7 @@ To build Socket from the command line:
 
 ## Testing
 
-To run the supplied unit tests for **Socket** from the command line:
-
-```
-% cd <path-to-clone>
-% swift build
-% swift test
-
-```
+TBD
 
 ## Using BlueSocket
 
@@ -105,23 +128,6 @@ To include BlueSocket into a Swift Package Manager package, add it to the `depen
 	dependencies: [
 		.Package(url: "https://github.com/Kitura/BlueSocket.git", majorVersion: <majorVersion>, minor: <minor>)
 	]
-```
-
-#### Carthage
-To include BlueSocket in a project using Carthage, add a line to your `Cartfile` with the GitHub organization and project names and version. For example:
-```
-	github "Kitura/BlueSocket" ~> <majorVersion>.<minor>
-```
-
-#### CocoaPods
-To include BlueSocket in a project using CocoaPods, you just add `BlueSocket` to your `Podfile`, for example:
-```
-    platform :ios, '10.0'
-
-    target 'MyApp' do
-        use_frameworks!
-        pod 'BlueSocket'
-    end
 ```
 
 ### Before starting
@@ -414,8 +420,8 @@ class EchoServer {
 					
 				} while shouldKeepRunning
 				
-				// Code moved after dictionary access since closing a socket turns the value of socket.socketfd to -1
-				// not the socketfd value we want to refers into the dictionary
+				// litewrap - Code moved after dictionary access since closing a socket turns the value of socketfd to -1
+				// not the socketfd value we want to refers into the dictionary !
 				
 				// print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
 				// socket.close()
@@ -467,14 +473,14 @@ print("Connect with a command line window by entering 'telnet ::1 \(port)'")
 
 server.run()
 ```
-This server can be built by specifying the following `Package.swift` file using Swift 4.
+This server can be built by specifying the following `Package.swift` file using Swift 5.6.2 or later
 ```swift
 import PackageDescription
 
 let package = Package(
 	name: "EchoServer",
 	dependencies: [
-		.package(url: "https://github.com/Kitura/BlueSocket.git", from:"1.0.8"),
+		.package(url: "https://github.com/litewrap/GreenSocket.git"),
 	],
 	targets: [
 	.target(
@@ -498,18 +504,12 @@ let package = Package(
 )
 ```
 
-The following command sequence will build and run the echo server on Linux.  If running on macOS or with any toolchain **NEWER** than the 8/18 toolchain, you can omit the `-Xcc -fblocks` switch as it's no longer needed.
-```
-$ swift build -Xcc -fblocks
+$ swift build
 $ .build/debug/EchoServer
 Swift Echo Server Sample
 Connect with a command line window by entering 'telnet ::1 1337'
 Listening on port: 1337
 ```
-
-## Community
-
-We love to talk server-side Swift and Kitura. Join our [Slack](http://swift-at-ibm-slack.mybluemix.net/) to meet the team!
 
 ## License
 
