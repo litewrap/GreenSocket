@@ -194,13 +194,8 @@ extension fd_set {
     /// Zero the fd_set
     ///
     public mutating func zero() {
-        #if swift(>=4.1)
         withCArrayAccess { arrayPtr in arrayPtr.initialize(repeating: 0, count: fd_set_size) }
         fd_count = 0
-        #else
-        withCArrayAccess { arrayPtr in arrayPtr.initialize(to: 0, count: fd_set_size); fd_count = 0  }
-        fd_count = 0
-        #endif
     }
         
     ///
