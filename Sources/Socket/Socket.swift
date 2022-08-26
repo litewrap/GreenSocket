@@ -1568,7 +1568,7 @@ public class Socket: SocketReader, SocketWriter {
                         let fd = Darwin.accept(self.socketfd, addressPointer, addressLengthPointer)
                     #endif
 
-                    print("After accept fd: \(fd)")
+                    //print("After accept fd: \(fd)")
                     
                     if fd < 0 {
                         
