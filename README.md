@@ -491,18 +491,6 @@ let package = Package(
 	]
 )
 ```
-Or if you are still using Swift 3, by specifying the following `Package.swift` file.
-```swift
-import PackageDescription
-
-let package = Package(
-	name: "EchoServer",
-	dependencies: [
-	.Package(url: "https://github.com/Kitura/BlueSocket.git", majorVersion: 1, minor: 0),
-	],
-	exclude: ["EchoServer.xcodeproj"]
-)
-```
 
 $ swift build
 $ .build/debug/EchoServer
