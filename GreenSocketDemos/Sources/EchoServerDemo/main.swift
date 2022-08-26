@@ -50,7 +50,7 @@ class EchoServer {
         queue.async { [unowned self] in
             
             do {
-                // Create an IPV6 socket...
+                // Create an IPV4 socket...
                 try self.listenSocket = Socket.create(family: .inet)
                 
                 guard let socket = self.listenSocket else {
