@@ -2,7 +2,7 @@
 
 Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, Linux and Windows.
 
-**GreenSocket** is **Kitura/BlueSocket** with modifications to works on Windows. Also **GreenSocket** provides some additional features (wip).
+**GreenSocket** is **Kitura/BlueSocket** with modifications to work on Windows. Also **GreenSocket** provides some additional features (wip).
 
 The documentation keep the original **BlueSocket** naming in titles where doc is applicable to both the original product and **GreenSocket**. Documentation titles named **GreenSocket**  shows the features added by **GreenSocket**.    
 
