@@ -70,8 +70,8 @@ On macOS / linux
 On Windows
 
 ```
-C: cd <path-to-clone>\GreenSocketDemos
-C: swift build
+C:\> cd <path-to-clone>\GreenSocketDemos
+C:\path-to-clone> swift build
 ```
 
 ## Run the demos
@@ -95,7 +95,7 @@ To run the EchoServerDemo on Windows
 Open a command prompt from the GreenSocketDemos folder
  
 ```
-C: .build\debug\EchoServerDemo.exe
+C:\path-to-clone> .build\debug\EchoServerDemo.exe
 ```
 
 To run the EchoClientDemo on Windows
@@ -103,7 +103,7 @@ To run the EchoClientDemo on Windows
 Open a second command prompt from the GreenSocketDemos folder
  
 ```
-C: .build\debug\EchoClientDemo.exe
+C:\path-to-clone> .build\debug\EchoClientDemo.exe
 ```
 
 ## Build Socket from the command line
