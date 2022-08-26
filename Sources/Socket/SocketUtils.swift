@@ -151,11 +151,6 @@ extension Socket.Address {
 
 // fd_set array access for Windows
 
-
-//#ifndef FD_SETSIZE
-//#define FD_SETSIZE      64
-//#endif /* FD_SETSIZE */
-
 let fd_set_size = 64
 
 extension fd_set {
@@ -194,9 +189,7 @@ extension fd_set {
 // functions zero, set, clear, isSet
 
 extension fd_set {
-    
-//   #define FD_ZERO(set) (((fd_set FAR *)(set))->fd_count=0)
-    
+        
     ///
     /// Zero the fd_set
     ///
@@ -209,22 +202,7 @@ extension fd_set {
         fd_count = 0
         #endif
     }
-    
-//    #define FD_SET(fd, set) do { \
-//        u_int __i; \
-//        for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count; __i++) { \
-//            if (((fd_set FAR *)(set))->fd_array[__i] == (fd)) { \
-//                break; \
-//            } \
-//        } \
-//        if (__i == ((fd_set FAR *)(set))->fd_count) { \
-//            if (((fd_set FAR *)(set))->fd_count < FD_SETSIZE) { \
-//                ((fd_set FAR *)(set))->fd_array[__i] = (fd); \
-//                ((fd_set FAR *)(set))->fd_count++; \
-//            } \
-//        } \
-//    } while(0)
-    
+        
     ///
     /// Set an fd in an fd_set
     ///
@@ -249,23 +227,7 @@ extension fd_set {
         fd_count = local_fd_count
         print("fd_count \(fd_count)")
     }
-    
-//    extern int PASCAL FAR __WSAFDIsSet(SOCKET, fd_set FAR *);
-//    #define FD_CLR(fd, set) do { \
-//        u_int __i; \
-//        for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count ; __i++) { \
-//            if (((fd_set FAR *)(set))->fd_array[__i] == fd) { \
-//                while (__i < ((fd_set FAR *)(set))->fd_count-1) { \
-//                    ((fd_set FAR *)(set))->fd_array[__i] = \
-//                        ((fd_set FAR *)(set))->fd_array[__i+1]; \
-//                    __i++; \
-//                } \
-//                ((fd_set FAR *)(set))->fd_count--; \
-//                break; \
-//            } \
-//        } \
-//    } while(0)
-    
+        
     ///
     /// Clear an fd from an fd_set
     ///
@@ -290,8 +252,6 @@ extension fd_set {
         print("fd_count \(fd_count)")
     }
     
-//    #define FD_ISSET(fd, set) __WSAFDIsSet((SOCKET)(fd), (fd_set FAR *)(set))
-
     ///
     /// Check if an fd is present in an fd_set
     ///
@@ -313,6 +273,7 @@ extension fd_set {
 }
 
 #else
+
 // fd_set extension for Linux and macOS, iOS..
 // functions zero, set, clear, isSet
 
