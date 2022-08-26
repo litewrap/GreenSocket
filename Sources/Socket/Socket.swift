@@ -3074,54 +3074,6 @@ public class Socket: SocketReader, SocketWriter {
         return returnCount
     }
     
-//    ///
-//    /// Read exactly length data bytes from the socket.
-//    ///
-//    /// - Parameters:
-//    ///     - data: The buffer to return the data in.
-//    ///     - length: The number of bytes to read.
-//    ///
-//    /// - Returns: The number of bytes returned in the buffer. Returns 0 if connection was closed by the remote.
-//    ///
-//    ///
-//    /// - Returns: The number of bytes returned in the buffer. Returns 0 if connection was closed by the remote.
-//    ///
-//    @discardableResult
-//    public func read(into data: inout Data, length: Int) throws -> Int {
-//
-//        // The socket must've been created and must be connected...
-//        if self.socketfd == Socket.SOCKET_INVALID_DESCRIPTOR {
-//
-//            throw Error(code: Socket.SOCKET_ERR_BAD_DESCRIPTOR, reason: "Socket has an invalid descriptor")
-//        }
-//
-//        if !self.isConnected {
-//
-//            throw Error(code: Socket.SOCKET_ERR_NOT_CONNECTED, reason: "Socket is not connected")
-//        }
-//
-//        // Read exactly length bytes...
-//        let count = try self.readDataIntoStorage(length: length)
-//
-//        // Did we get data?
-//        var returnCount: Int = 0
-//        if count > 0 {
-//
-//            // - Yes, move to caller's buffer...
-//            data.append(self.readStorage.bytes.assumingMemoryBound(to: UInt8.self), count: self.readStorage.length)
-//
-//            returnCount = self.readStorage.length
-//
-//            // - Reset the storage buffer...
-//            self.readStorage.length = 0
-//        }
-//
-//        // if returnCount is 0 this means the remote connection was closed
-//        // in such case, remoteConnectionClosed would be true
-//        return returnCount
-//
-//    }
-
     // MARK: --- UDP
 
     ///
