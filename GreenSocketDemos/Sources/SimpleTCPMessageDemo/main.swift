@@ -21,15 +21,11 @@
 import Foundation
 import Socket
 
-
-
-
 //
 // This extension add send / receive message methods - implementing a rudimentary message layer
 // The message protocol has two parts: a 16-bit header followed by n-bytes paylod
 // The 16-bit header value represent the payload size in bytes
 //
-
 extension Socket {
     
     func sendMessage(data payload: Data, timeout: UInt) throws -> Int {
