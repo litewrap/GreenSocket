@@ -28,7 +28,7 @@ do {
     let socket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
     defer {
         socket.close()
-        print("Echo Client Demo end")
+        print("EchoClient Demo end")
     }
     // if EchoServerDemo runs on another machine change serverAddress to the ipv4 server address
     let serverAddress = "127.0.0.1" // default to localhost
@@ -39,7 +39,7 @@ do {
     
     let initialResponse = try socket.readString()
     if let response = initialResponse {
-        print("Echo Server started and say:")
+        print("EchoServer started and say:")
         print(response)
         print("")
     }

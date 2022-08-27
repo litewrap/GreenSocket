@@ -21,7 +21,7 @@
 import Foundation
 import Socket
 
-print("GreenSocket Simple UDP Demo")
+print("GreenSocket SimpleUDP Demo")
 
 do {
     let socket = try Socket.create(family: .inet, type: .datagram, proto: .udp)
@@ -58,7 +58,7 @@ do {
 
     socket.close()
     
-    print("Simple UDP Demo")
+    print("SimpleUDP Demo end")
 
 }
 catch {

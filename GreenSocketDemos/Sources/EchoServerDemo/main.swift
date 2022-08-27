@@ -17,7 +17,7 @@ class EchoServer {
     var listenSocket: Socket? = nil
     var continueRunningValue = true
     var connectedSockets = [Int32: Socket]()
-    let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
+    let socketLockQueue = DispatchQueue(label: "socketLockQueue")
     var continueRunning: Bool {
         set(newValue) {
             socketLockQueue.sync {
