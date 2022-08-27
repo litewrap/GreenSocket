@@ -2,11 +2,9 @@
 
 Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS, Linux and Windows.
 
-**GreenSocket** is **Kitura/BlueSocket** with modifications to work on Windows. Also **GreenSocket** provides some additional features (wip).
+**GreenSocket** is **Kitura/BlueSocket** with modifications to work on Windows. Also **GreenSocket** provides some additional features.
 
-The documentation keep the original **BlueSocket** naming in titles where doc is applicable to both the original product and **GreenSocket**. Documentation titles named **GreenSocket**  shows the features added by **GreenSocket**.    
-
-## Prerequisites
+ ## Prerequisites
 
 ### Swift
 
@@ -54,7 +52,7 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 * [BlueSSLService](https://github.com/Kitura/BlueSSLService.git) can be used to add **SSL/TLS** support.
     - If using this package, please note that the  **libssl-dev** package is required to be installed when building on Linux.
 
-* No add-ins tested on Windows
+* GreenSoket: No add-ins tested on Windows
 
 ## Build the demos
 
