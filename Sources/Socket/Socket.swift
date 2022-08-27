@@ -3037,7 +3037,6 @@ public class Socket: SocketReader, SocketWriter {
     ///
     /// - Parameters:
     ///     - data: The buffer to return the data in.
-    ///     - length: The number of bytes to read.
     ///
     /// - Returns: The number of bytes returned in the buffer. Returns 0 if connection was closed by the remote.
     ///
@@ -4163,3 +4162,178 @@ public class Socket: SocketReader, SocketWriter {
         #endif
     }
 }
+
+//
+//
+//
+//
+
+// *********************************************************************************************
+/// This extension implement additionals methods to original BlueSocket
+// *********************************************************************************************
+extension Socket {
+    
+    public enum ReadLengthError : Swift.Error {
+        case timeout
+        case remoteClosedConnection
+    }
+    
+    ///
+    /// Read exactly length data bytes from the socket.
+    /// This function reads exactly *length* data byts on a socket and returns it in the `Data` object that was passed.
+    /// Optional *timeout* is in milliseconds.
+    /// This read method help building message layer where we are waiting to read exactly n-bytes.
+    /// The method may throws on socket errors in addition to specialized **ReadLengthError** error type.
+    /// This allows easy handling of timeout or remote closed connection errors.
+    ///
+    /// - Parameters:
+    ///     - data: The buffer to return the data in.
+    ///     - length: The number of bytes to read.
+    ///     - timeout: Timeout value in millisecond
+    ///
+    /// - Returns: The number of bytes returned in the buffer. Returns 0 if connection was closed by the remote.
+    ///
+    @discardableResult
+    public func read(into data: inout Data, length: Int, timeout: UInt) throws -> Int {
+        
+        // The socket must've been created and must be connected...
+        if self.socketfd == Socket.SOCKET_INVALID_DESCRIPTOR {
+
+            throw Error(code: Socket.SOCKET_ERR_BAD_DESCRIPTOR, reason: "Socket has an invalid descriptor")
+        }
+
+        if !self.isConnected {
+
+            throw Error(code: Socket.SOCKET_ERR_NOT_CONNECTED, reason: "Socket is not connected")
+        }
+
+        // Read exactly length bytes...
+        //print("Read exactly \(length) bytes...")
+        let count = try self.readDataIntoStorage(length: length, timeout: timeout)
+        
+        // Did we get data?
+        var returnCount: Int = 0
+        if count > 0 {
+
+            // - Yes, move to caller's buffer...
+            data.append(self.readStorage.bytes.assumingMemoryBound(to: UInt8.self), count: self.readStorage.length)
+
+            returnCount = self.readStorage.length
+
+            // - Reset the storage buffer...
+            self.readStorage.length = 0
+        }
+
+        // if returnCount is 0 this means the remote connection was closed
+        // in such case, remoteConnectionClosed would be true
+        return returnCount
+    }
+    
+    ///
+    /// Private function that reads exactly length bytes on an open socket into storage.
+    /// This function reads exactly length data byts on a socket and returns it in the Data object that was passed.
+    /// Optional timeout is in milliseconds.
+    ///
+    /// - Returns: number of bytes read.
+    ///
+    private func readDataIntoStorage(length: Int, timeout: UInt) throws -> Int {
+
+        var receivedLength = 0
+        self.readBuffer.initialize(to: 0x0)
+
+        var recvFlags: Int32 = 0
+        #if os(Windows)
+        if self.readStorage.length > 0 {
+            //recvFlags |= Int32(MSG_DONTWAIT)
+        }
+        #else
+        if self.readStorage.length > 0 {
+            recvFlags |= Int32(MSG_DONTWAIT)
+        }
+        #endif
+
+        // Read all the available data...
+        var count: Int = 0
+        while receivedLength < length {
+
+            if self.delegate == nil {
+                //print("call wait")
+                
+                let result = try Socket.wait(for: [self], timeout: timeout)
+                if result == nil {
+                    //print("*************TIMEOUT***********")
+                    // Timeout occured
+                    //return -1
+                    throw ReadLengthError.timeout
+                }
+                
+                #if os(Linux)
+                    count = Glibc.recv(self.socketfd, self.readBuffer, length - receivedLength, recvFlags)
+                #elseif os(Windows)
+                    count = Int(WinSDK.recv(SOCKET(self.socketfd), self.readBuffer, Int32(length - receivedLength), recvFlags))
+                #else
+                    count = Darwin.recv(self.socketfd, self.readBuffer, length - receivedLength, recvFlags)
+                #endif
+                //print("readDataIntoStorage: \(count)")
+                receivedLength = count
+            }
+            else {
+                repeat {
+                    do {
+                        count = try self.delegate!.recv(buffer: self.readBuffer, bufSize: self.readBufferSize)
+                        break
+
+                    } catch let error {
+                        guard let err = error as? SSLError else {
+                            throw error
+                        }
+
+                        switch err {
+                        case .success:
+                            break
+                        case .retryNeeded:
+                            do {
+                                try wait(forRead: true)
+                            } catch let waitError {
+                                throw waitError
+                            }
+                            continue
+                        default:
+                            throw Error(with: err)
+                        }
+                    }
+                } while true
+            }
+            // Check for error...
+            if count < 0 {
+                //print("readDataIntoStorage count < 0 \(count)")
+                switch errno {
+                // - Could be an error, but if errno is EAGAIN or EWOULDBLOCK (if a non-blocking socket),
+                //    it means there was NO data to read... so continue reading until length bytes received
+                case EWOULDBLOCK, EAGAIN:
+                    continue
+
+                case ECONNRESET:
+                    // - Handle a connection reset by peer (ECONNRESET) and throw a different exception...
+                    self.remoteConnectionClosed = true
+                    throw Error(code: Socket.SOCKET_ERR_CONNECTION_RESET, reason: self.lastError())
+
+                default:
+                    // - Something went wrong...
+                    throw Error(code: Socket.SOCKET_ERR_RECV_FAILED, reason: self.lastError())
+                }
+            }
+
+            if count == 0 {
+                self.remoteConnectionClosed = true
+                throw ReadLengthError.remoteClosedConnection
+                //return 0
+            }
+
+            // Save the data in the buffer...
+            self.readStorage.append(self.readBuffer, length: count)
+        }
+        return self.readStorage.length
+    }
+}
+

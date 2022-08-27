@@ -15,6 +15,9 @@ let package = Package(
         .executable(
             name: "SimpleUDPDemo",
             targets: ["SimpleUDPDemo"]),
+        .executable(
+            name: "SimpleTCPMessageDemo",
+            targets: ["SimpleTCPMessageDemo"]),
     ],
     dependencies: [
         .package(name: "GreenSocket", path: ".."),
@@ -32,6 +35,11 @@ let package = Package(
             ]),
         .target(
             name: "SimpleUDPDemo",
+            dependencies: [
+                .product(name: "Socket", package: "GreenSocket"),
+            ]),
+        .target(
+            name: "SimpleTCPMessageDemo",
             dependencies: [
                 .product(name: "Socket", package: "GreenSocket"),
             ]),
