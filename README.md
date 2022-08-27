@@ -88,6 +88,14 @@ Open a second terminal from the GreenSocketDemos folder
 % ./.build/debug/EchoClientDemo
 ```
 
+To run the SimpleTCPMessageDemo on macOS / Linux
+
+Open a terminal from the GreenSocketDemos folder
+```
+% ./.build/debug/SimpleTCPMessageDemo
+```
+
+
 To run the EchoServerDemo on Windows
 
 Open a command prompt from the GreenSocketDemos folder
@@ -103,6 +111,15 @@ Open a second command prompt from the GreenSocketDemos folder
 ```
 C:\path-to-clone> .build\debug\EchoClientDemo.exe
 ```
+
+To run the SimpleTCPMessageDemo on Windows
+
+Open a command prompt from the GreenSocketDemos folder
+ 
+```
+C:\path-to-clone> .build\debug\SimpleTCPMessageDemo.exe
+```
+
 
 ## Build Socket from the command line
 
