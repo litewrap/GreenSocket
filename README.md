@@ -4,6 +4,8 @@ Socket framework for Swift using the Swift Package Manager. Works on iOS, macOS,
 
 **GreenSocket** is **Kitura/BlueSocket** with modifications to work on Windows. Also **GreenSocket** provides some additional features (wip).
 
+The documentation keep the original **BlueSocket** naming in titles where doc is applicable to both the original product and **GreenSocket**. Documentation titles named **GreenSocket**  shows the features added by **GreenSocket**.    
+
 ## Prerequisites
 
 ### Swift
@@ -50,7 +52,7 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 ### Add-ins
 
 * [BlueSSLService](https://github.com/Kitura/BlueSSLService.git) can be used to add **SSL/TLS** support.
-	- If using this package, please note that the  **libssl-dev** package is required to be installed when building on Linux.
+    - If using this package, please note that the  **libssl-dev** package is required to be installed when building on Linux.
 
 * No add-ins tested on Windows
 
@@ -123,9 +125,9 @@ TBD
 
 To include BlueSocket into a Swift Package Manager package, add it to the `dependencies` attribute defined in your `Package.swift` file. You can select the version using the `majorVersion` and `minor` parameters. For example:
 ```
-	dependencies: [
-		.Package(url: "https://github.com/Kitura/BlueSocket.git", majorVersion: <majorVersion>, minor: <minor>)
-	]
+    dependencies: [
+        .Package(url: "https://github.com/Kitura/BlueSocket.git", majorVersion: <majorVersion>, minor: <minor>)
+    ]
 ```
 
 ### Before starting
@@ -139,16 +141,16 @@ import Socket
 
 **BlueSocket** supports the following families, types and protocols:
 - *Families:*
-	- IPV4: `Socket.ProtocolFamily.inet`
-	- IPV6: `Socket.ProtocolFamily.inet6`
-	- UNIX: `Socket.ProtocolFamily.unix`
+    - IPV4: `Socket.ProtocolFamily.inet`
+    - IPV6: `Socket.ProtocolFamily.inet6`
+    - UNIX: `Socket.ProtocolFamily.unix`
 - *Types:*
-	- Stream: `Socket.SocketType.stream`
-	- Datagram: `Socket.SocketType.datagram`
+    - Stream: `Socket.SocketType.stream`
+    - Datagram: `Socket.SocketType.datagram`
 - *Protocols:*
-	- TCP: `Socket.SocketProtocol.tcp`
-	- UDP: `Socket.SocketProtocol.udp`
-	- UNIX: `Socket.SocketProtocol.unix`
+    - TCP: `Socket.SocketProtocol.tcp`
+    - UDP: `Socket.SocketProtocol.udp`
+    - UNIX: `Socket.SocketProtocol.unix`
 
 ### Creating a socket.
 
@@ -211,6 +213,11 @@ In addition to the `create(connectedUsing:)` factory method described above, **B
 - `read(into buffer: UnsafeMutablePointer<CChar>, bufSize: Int, truncate: Bool = false)` - This function allows you to read data into a buffer of a specified size by providing an *unsafe* pointer to that buffer and an integer the denotes the size of that buffer.  This API (in addition to other types of exceptions) will throw a `Socket.SOCKET_ERR_RECV_BUFFER_TOO_SMALL` if the buffer provided is too small, unless `truncate = true` in which case the socket will act as if only `bufSize` bytes were read (unretrieved bytes will be returned in the next call). If `truncate = false`, you will need to call again with proper buffer size (see `Error.bufferSizeNeeded`in *Socket.swift* for more information).
 - **Note:** All of the read APIs above except `readString()` can return zero (0). This can indicate that the remote connection was closed or it could indicate that the socket would block (assuming you've turned off blocking).  To differentiate between the two, the property `remoteConnectionClosed` can be checked. If `true`, the socket remote partner has closed the connection and this `Socket` instance should be closed.
 
+### GreenSocket additional method for reading data from a socket (TCP/UNIX).
+
+**GreenSocket** provides the additional read method.
+- `read(into data: inout Data, length: Int, timeout: UInt)` - This function reads exactly *length* data byts on a socket and returns it in the `Data` object that was passed. Optional *timeout* is in milliseconds. This read method help building message layer where we are waiting to read exactly n-bytes. The method may throws on socket errors in addition to specialized **ReadLengthError** error type. This allows easy handling of timeout or remote closed connection errors.  See the SimpleTCPMessageDemo.
+
 ### Writing data to a Socket (TCP/UNIX).
 
 In addition to reading from a socket, **BlueSocket** also supplies four methods for writing data to a socket. These are (in recommended use order):
@@ -270,198 +277,198 @@ import Socket
 import Dispatch
 
 class EchoServer {
-	
-	static let quitCommand: String = "QUIT"
-	static let shutdownCommand: String = "SHUTDOWN"
-	static let bufferSize = 4096
-	
-	let port: Int
-	var listenSocket: Socket? = nil
-	var continueRunningValue = true
-	var connectedSockets = [Int32: Socket]()
-	let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
-	var continueRunning: Bool {
-		set(newValue) {
-			socketLockQueue.sync {
-				self.continueRunningValue = newValue
-			}
-		}
-		get {
-			return socketLockQueue.sync {
-				self.continueRunningValue
-			}
-		}
-	}
+    
+    static let quitCommand: String = "QUIT"
+    static let shutdownCommand: String = "SHUTDOWN"
+    static let bufferSize = 4096
+    
+    let port: Int
+    var listenSocket: Socket? = nil
+    var continueRunningValue = true
+    var connectedSockets = [Int32: Socket]()
+    let socketLockQueue = DispatchQueue(label: "com.kitura.serverSwift.socketLockQueue")
+    var continueRunning: Bool {
+        set(newValue) {
+            socketLockQueue.sync {
+                self.continueRunningValue = newValue
+            }
+        }
+        get {
+            return socketLockQueue.sync {
+                self.continueRunningValue
+            }
+        }
+    }
 
-	init(port: Int) {
-		self.port = port
-	}
-	
-	deinit {
-		// Close all open sockets...
-		for socket in connectedSockets.values {
-			socket.close()
-		}
-		self.listenSocket?.close()
-	}
-	
-	func run() {
-		
-		let queue = DispatchQueue.global(qos: .userInteractive)
-		
-		queue.async { [unowned self] in
-			
-			do {
-				// Create an IPV6 socket...
-				try self.listenSocket = Socket.create(family: .inet6)
-				
-				guard let socket = self.listenSocket else {
-					
-					print("Unable to unwrap socket...")
-					return
-				}
-				
-				try socket.listen(on: self.port)
-				
-				print("Listening on port: \(socket.listeningPort)")
-				
-				repeat {
-					let newSocket = try socket.acceptClientConnection()
-					
-					print("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
-					print("Socket Signature: \(String(describing: newSocket.signature?.description))")
-					
-					self.addNewConnection(socket: newSocket)
-					
-				} while self.continueRunning
-				
-			}
-			catch let error {
-				guard let socketError = error as? Socket.Error else {
-					print("Unexpected error...")
-					return
-				}
-				
-				if self.continueRunning {
-					
-					print("Error reported:\n \(socketError.description)")
-					
-				}
-			}
-		}
-		dispatchMain()
-	}
-	
-	func addNewConnection(socket: Socket) {
-		
-		// Add the new socket to the list of connected sockets...
-		socketLockQueue.sync { [unowned self, socket] in
-			self.connectedSockets[socket.socketfd] = socket
-		}
-		
-		// Get the global concurrent queue...
-		let queue = DispatchQueue.global(qos: .default)
-		
-		// Create the run loop work item and dispatch to the default priority global queue...
-		queue.async { [unowned self, socket] in
-			
-			var shouldKeepRunning = true
-			
-			var readData = Data(capacity: EchoServer.bufferSize)
-			
-			do {
-				// Write the welcome string...
-				try socket.write(from: "Hello, type 'QUIT' to end session\nor 'SHUTDOWN' to stop server.\n")
-				
-				repeat {
-					let bytesRead = try socket.read(into: &readData)
-					
-					if bytesRead > 0 {
-						guard let response = String(data: readData, encoding: .utf8) else {
-							
-							print("Error decoding response...")
-							readData.count = 0
-							break
-						}
-						if response.hasPrefix(EchoServer.shutdownCommand) {
-							
-							print("Shutdown requested by connection at \(socket.remoteHostname):\(socket.remotePort)")
-							
-							// Shut things down...
-							self.shutdownServer()
-							
-							return
-						}
-						print("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
-						let reply = "Server response: \n\(response)\n"
-						try socket.write(from: reply)
-						
-						if (response.uppercased().hasPrefix(EchoServer.quitCommand) || response.uppercased().hasPrefix(EchoServer.shutdownCommand)) &&
-							(!response.hasPrefix(EchoServer.quitCommand) && !response.hasPrefix(EchoServer.shutdownCommand)) {
-							
-							try socket.write(from: "If you want to QUIT or SHUTDOWN, please type the name in all caps. 😃\n")
-						}
-						
-						if response.hasPrefix(EchoServer.quitCommand) || response.hasSuffix(EchoServer.quitCommand) {
-							
-							shouldKeepRunning = false
-						}
-					}
-					
-					if bytesRead == 0 {
-						
-						shouldKeepRunning = false
-						break
-					}
-					
-					readData.count = 0
-					
-				} while shouldKeepRunning
-				
-				// litewrap - Code moved after dictionary access since closing a socket turns the value of socketfd to -1
-				// not the socketfd value we want to refers into the dictionary !
-				
-				// print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
-				// socket.close()
-				
-				self.socketLockQueue.sync { [unowned self, socket] in
-					self.connectedSockets[socket.socketfd] = nil
-				}
-				
-				print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
-				socket.close()
-				
-			}
-			catch let error {
-				guard let socketError = error as? Socket.Error else {
-					print("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
-					return
-				}
-				if self.continueRunning {
-					print("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
-				}
-			}
-		}
-	}
-	
-	func shutdownServer() {
-		print("\nShutdown in progress...")
+    init(port: Int) {
+        self.port = port
+    }
+    
+    deinit {
+        // Close all open sockets...
+        for socket in connectedSockets.values {
+            socket.close()
+        }
+        self.listenSocket?.close()
+    }
+    
+    func run() {
+        
+        let queue = DispatchQueue.global(qos: .userInteractive)
+        
+        queue.async { [unowned self] in
+            
+            do {
+                // Create an IPV6 socket...
+                try self.listenSocket = Socket.create(family: .inet6)
+                
+                guard let socket = self.listenSocket else {
+                    
+                    print("Unable to unwrap socket...")
+                    return
+                }
+                
+                try socket.listen(on: self.port)
+                
+                print("Listening on port: \(socket.listeningPort)")
+                
+                repeat {
+                    let newSocket = try socket.acceptClientConnection()
+                    
+                    print("Accepted connection from: \(newSocket.remoteHostname) on port \(newSocket.remotePort)")
+                    print("Socket Signature: \(String(describing: newSocket.signature?.description))")
+                    
+                    self.addNewConnection(socket: newSocket)
+                    
+                } while self.continueRunning
+                
+            }
+            catch let error {
+                guard let socketError = error as? Socket.Error else {
+                    print("Unexpected error...")
+                    return
+                }
+                
+                if self.continueRunning {
+                    
+                    print("Error reported:\n \(socketError.description)")
+                    
+                }
+            }
+        }
+        dispatchMain()
+    }
+    
+    func addNewConnection(socket: Socket) {
+        
+        // Add the new socket to the list of connected sockets...
+        socketLockQueue.sync { [unowned self, socket] in
+            self.connectedSockets[socket.socketfd] = socket
+        }
+        
+        // Get the global concurrent queue...
+        let queue = DispatchQueue.global(qos: .default)
+        
+        // Create the run loop work item and dispatch to the default priority global queue...
+        queue.async { [unowned self, socket] in
+            
+            var shouldKeepRunning = true
+            
+            var readData = Data(capacity: EchoServer.bufferSize)
+            
+            do {
+                // Write the welcome string...
+                try socket.write(from: "Hello, type 'QUIT' to end session\nor 'SHUTDOWN' to stop server.\n")
+                
+                repeat {
+                    let bytesRead = try socket.read(into: &readData)
+                    
+                    if bytesRead > 0 {
+                        guard let response = String(data: readData, encoding: .utf8) else {
+                            
+                            print("Error decoding response...")
+                            readData.count = 0
+                            break
+                        }
+                        if response.hasPrefix(EchoServer.shutdownCommand) {
+                            
+                            print("Shutdown requested by connection at \(socket.remoteHostname):\(socket.remotePort)")
+                            
+                            // Shut things down...
+                            self.shutdownServer()
+                            
+                            return
+                        }
+                        print("Server received from connection at \(socket.remoteHostname):\(socket.remotePort): \(response) ")
+                        let reply = "Server response: \n\(response)\n"
+                        try socket.write(from: reply)
+                        
+                        if (response.uppercased().hasPrefix(EchoServer.quitCommand) || response.uppercased().hasPrefix(EchoServer.shutdownCommand)) &&
+                            (!response.hasPrefix(EchoServer.quitCommand) && !response.hasPrefix(EchoServer.shutdownCommand)) {
+                            
+                            try socket.write(from: "If you want to QUIT or SHUTDOWN, please type the name in all caps. 😃\n")
+                        }
+                        
+                        if response.hasPrefix(EchoServer.quitCommand) || response.hasSuffix(EchoServer.quitCommand) {
+                            
+                            shouldKeepRunning = false
+                        }
+                    }
+                    
+                    if bytesRead == 0 {
+                        
+                        shouldKeepRunning = false
+                        break
+                    }
+                    
+                    readData.count = 0
+                    
+                } while shouldKeepRunning
+                
+                // litewrap - Code moved after dictionary access since closing a socket turns the value of socketfd to -1
+                // not the socketfd value we want to refers into the dictionary !
+                
+                // print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                // socket.close()
+                
+                self.socketLockQueue.sync { [unowned self, socket] in
+                    self.connectedSockets[socket.socketfd] = nil
+                }
+                
+                print("Socket: \(socket.remoteHostname):\(socket.remotePort) closed...")
+                socket.close()
+                
+            }
+            catch let error {
+                guard let socketError = error as? Socket.Error else {
+                    print("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
+                    return
+                }
+                if self.continueRunning {
+                    print("Error reported by connection at \(socket.remoteHostname):\(socket.remotePort):\n \(socketError.description)")
+                }
+            }
+        }
+    }
+    
+    func shutdownServer() {
+        print("\nShutdown in progress...")
 
-		self.continueRunning = false
-		
-		// Close all open sockets...
-		for socket in connectedSockets.values {
-			
-			self.socketLockQueue.sync { [unowned self, socket] in
-				self.connectedSockets[socket.socketfd] = nil
-				socket.close()
-			}
-		}
-		
-		DispatchQueue.main.sync {
-			exit(0)
-		}
-	}
+        self.continueRunning = false
+        
+        // Close all open sockets...
+        for socket in connectedSockets.values {
+            
+            self.socketLockQueue.sync { [unowned self, socket] in
+                self.connectedSockets[socket.socketfd] = nil
+                socket.close()
+            }
+        }
+        
+        DispatchQueue.main.sync {
+            exit(0)
+        }
+    }
 }
 
 let port = 1337
@@ -476,17 +483,17 @@ This server can be built by specifying the following `Package.swift` file using 
 import PackageDescription
 
 let package = Package(
-	name: "EchoServer",
-	dependencies: [
-		.package(url: "https://github.com/litewrap/GreenSocket.git"),
-	],
-	targets: [
-	.target(
-		name: "EchoServer",
-		dependencies: [
-			"Socket"
-		]),
-	]
+    name: "EchoServer",
+    dependencies: [
+        .package(url: "https://github.com/litewrap/GreenSocket.git"),
+    ],
+    targets: [
+    .target(
+        name: "EchoServer",
+        dependencies: [
+            "Socket"
+        ]),
+    ]
 )
 ```
 
