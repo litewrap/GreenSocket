@@ -1283,16 +1283,12 @@ public class Socket: SocketReader, SocketWriter {
         var readfds = fd_set()
         readfds.zero()
     
-
         var highSocketfd: Int32 = 0
         for socket in sockets {
-
             if socket.socketfd > highSocketfd {
                 highSocketfd = socket.socketfd
             }
-            #if !os(Windows)
             readfds.set(socket.socketfd)
-            #endif
         }
 
         // Issue the select...
@@ -1305,7 +1301,6 @@ public class Socket: SocketReader, SocketWriter {
 
         // A count of less than zero indicates select failed...
         if count < 0 {
-
             throw Error(code: Socket.SOCKET_ERR_SELECT_FAILED, reason: String(validatingUTF8: strerror(errno)) ?? "Error: \(errno)")
         }
 

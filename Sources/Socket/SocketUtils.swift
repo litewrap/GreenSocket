@@ -217,10 +217,10 @@ extension fd_set {
                     local_fd_count += 1
                 }
             }
-            print("index \(index) local_fd_count \(local_fd_count)")
+            //print("index \(index) local_fd_count \(local_fd_count)")
         }
         fd_count = local_fd_count
-        print("fd_count \(fd_count)")
+        //print("fd_count \(fd_count)")
     }
         
     ///
@@ -233,7 +233,7 @@ extension fd_set {
         withCArrayAccess { arrayPtr in
             for var i in 0..<Int(local_fd_count) {
                 if arrayPtr[i] == fd {
-                    print("clear found at index \(i)")
+                    //print("clear found at index \(i)")
                     while i < fd_set_size - 1 {
                         arrayPtr[i] =  arrayPtr[i + 1]
                         i += 1
@@ -244,7 +244,7 @@ extension fd_set {
             }
         }
         fd_count = local_fd_count
-        print("fd_count \(fd_count)")
+        //print("fd_count \(fd_count)")
     }
     
     ///
