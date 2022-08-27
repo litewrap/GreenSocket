@@ -20,6 +20,10 @@
 
 import Foundation
 import Socket
+#if os(Windows)
+import WinSDK  // for msleep
+#endif
+
 
 //
 // This extension add send / receive message methods - implementing a rudimentary message layer
@@ -76,7 +80,7 @@ do {
     print("Client: \(count) bytes sent. 2 bytes header + \(str.count) bytes string: \"\(str)\"")
     
     repeat {
-        usleep(10_000)
+        msleep(milliseconds: 10)
     } while demoRunning
 }
 catch let error as Socket.ReadLengthError {
@@ -120,3 +124,12 @@ func runServer() {
     }
 }
 
+func msleep(milliseconds: Int32) {
+
+#if os(Windows)
+WinSDK.Sleep(UInt32(milliseconds))
+#else
+    usleep(UInt32(milliseconds) * 1000)
+#endif
+
+}
