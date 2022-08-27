@@ -216,7 +216,7 @@ In addition to the `create(connectedUsing:)` factory method described above, **B
 ### GreenSocket additional method for reading data from a socket (TCP/UNIX).
 
 **GreenSocket** provides the additional read method.
-- `read(into data: inout Data, length: Int, timeout: UInt)` - This function reads exactly *length* data byts on a socket and returns it in the `Data` object that was passed. Optional *timeout* is in milliseconds. This read method help building message layer where we are waiting to read exactly n-bytes. The method may throws on socket errors in addition to specialized **ReadLengthError** error type. This allows easy handling of timeout or remote closed connection errors.  See the SimpleTCPMessageDemo.
+- `read(into data: inout Data, length: Int, timeout: UInt)` - This function reads exactly *length* data bytes on a socket and returns it in the `Data` object that was passed. Optional *timeout* is in milliseconds. This read method help building message layer where we are waiting to read exactly n-bytes. The method may throws on socket errors in addition to specialized **ReadLengthError** error type. This allows easy handling of timeout or remote closed connection errors.  See the SimpleTCPMessageDemo.
 
 ### Writing data to a Socket (TCP/UNIX).
 
