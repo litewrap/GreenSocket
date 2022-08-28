@@ -39,8 +39,7 @@ If creating a UDP server on iOS, you may need to follow a few steps:
 
 ### Windows
 
-* Windows 10. Follow the Windows installation steps (https://www.swift.org/download/)
-* GreenSocket should work on *Windows 11* but has **NOT** been tested yet.
+* Windows 10 / 11. Follow the Windows installation steps (https://www.swift.org/download/).
 
 ### Other Platforms
 
