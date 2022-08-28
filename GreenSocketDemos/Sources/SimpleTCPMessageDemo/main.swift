@@ -41,7 +41,7 @@ extension Socket {
     func recvMessage(into data: inout Data, timeout: UInt) throws -> Int {
         // Read the header
         var headerData = Data()
-        let headerCount = try self.read(into: &headerData, length: MemoryLayout<UInt16>.size, timeout: 5000)
+        let headerCount = try self.read(into: &headerData, length: MemoryLayout<UInt16>.size, timeout: timeout)
         if headerCount > 0 {
             // Then read the payload
             // Compute the payload length from the header value
@@ -50,7 +50,7 @@ extension Socket {
             
             // Read the remaining payloadLength bytes
             print("recvMessage: Read remaining \(payloadLength) bytes...")
-            return try self.read(into: &data, length: Int(payloadLength), timeout: 5000)
+            return try self.read(into: &data, length: Int(payloadLength), timeout: timeout)
         }
         return 0
     }
