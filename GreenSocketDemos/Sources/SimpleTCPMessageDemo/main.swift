@@ -32,7 +32,7 @@ import WinSDK  // for msleep
 //
 extension Socket {
     
-    func sendMessage(data payload: Data, timeout: UInt) throws -> Int {
+    func sendMessage(data payload: Data) throws -> Int {
         let header  = UInt16(payload.count)
         let headerData = withUnsafeBytes(of: header.bigEndian) { bytes in Data(bytes) }
         return try self.write(from: headerData + payload)
@@ -76,7 +76,7 @@ do {
     
     let str = "Hello Swift World!"
     let data = str.data(using: .utf8)!
-    let count = try socket.sendMessage(data: data, timeout: 5000)
+    let count = try socket.sendMessage(data: data)
     print("Client: \(count) bytes sent. 2 bytes header + \(str.count) bytes string: \"\(str)\"")
     
     repeat {
