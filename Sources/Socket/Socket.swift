@@ -4158,13 +4158,14 @@ public class Socket: SocketReader, SocketWriter {
     }
 }
 
-//
-//
-//
-//
+// *********************************************************************************************
+//  GreenSocket additions
+//  Create by Réjean Lamy on 2022/08/24.
+//  Copyright © 2022 Réjean Lamy. All rights reserved.
+// *********************************************************************************************
 
 // *********************************************************************************************
-/// This extension implement additionals methods to original BlueSocket
+//  This extension implement additional read method
 // *********************************************************************************************
 extension Socket {
     
@@ -4270,7 +4271,7 @@ extension Socket {
                     count = Darwin.recv(self.socketfd, self.readBuffer, length - receivedLength, recvFlags)
                 #endif
                 //print("readDataIntoStorage: \(count)")
-                receivedLength = count
+                receivedLength += count
             }
             else {
                 repeat {
